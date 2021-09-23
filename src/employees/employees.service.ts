@@ -1,29 +1,27 @@
 import { Injectable } from '@nestjs/common';
+import { Employee } from './employee.model';
+import { Department } from 'src/departments/department.model';
 
 @Injectable()
 export class EmployeesService {
-    getEmployees(name?: string) : object {
-        //check parametr and return
-        return {
-            "filter" : (name != undefined ? name : "no"),
-            "employees": []
+    async getEmployees(name?: string) {
+        console.log(name);
+        if(name != undefined) {
+            return await Employee.find({ firstName: name })
+        }else {
+            return await Employee.find()
         }
     }
-    addEmployee(body: any) : void {
-
+    async addEmployee(body: any) {
+        const department = await Department.findOne({id: body.departmentId})
+        const employee = new Employee(body.firstName, body.lastName, new Date(), body.company, body.position, department)
+        await employee.save()
     }
-    deleteEmployee(body: any) : void {
-
+    async deleteEmployee(employeeId: number) {
+        await (await Employee.findOne({ id: employeeId })).remove();
     }
-    editEmployee(body: any) : void {
-
-    }
-    getEmployee(id? : string) : object {
-        return {
-            "employee": {
-                "id": "id"
-            }
-        }
+    async getEmployee(id : number) {
+        return await Employee.findOne({id: id}, {relations: ["department"]})
     }
 
 }

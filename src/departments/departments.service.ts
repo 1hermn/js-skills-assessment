@@ -1,35 +1,57 @@
 import { Injectable } from '@nestjs/common';
+import e from 'express';
+import { Employee } from 'src/employees/employee.model';
+import { Department } from './department.model';
 
 @Injectable()
 export class DepartmentsService {
-    getDepartments() : object {
+    async getDepartments() {
+        var departments = await Department.find({ relations: ["employees"]})
+        for(var key in departments) {
+            var dep = departments[key] 
+            dep["employeesCount"] = departments[key].employees.length;
+            delete dep.employees
+        }
         return {
-            departments: []
+            departments: departments
         }
     }
-    getDepartment(departmentId: number): object {
+    async getDepartment(departmentId: number) {
         return {
-            department: {
-                id: departmentId,
-                data: [],
-                employees: []
-            }
+            department: await Department.findOne({id: departmentId}, { relations: ["employees"]})
         }
     }
-    add(body: any): void {
-        //get parametrs from body, check and add
+    async add(body: any) {
+        //TODO: validate body
+        var name = body['name']
+        var description = body['description']
+        var date = new Date();
+        const department = new Department(name, date, description)
+        await department.save();
     }
-    delete(body: any): void {
-        //get id from body and delete department
+    async delete(departmentId : number) {
+        //TODO: check department id
+        const department = await Department.findOne({id: departmentId})
+        await department.remove();
     }
-    edit(body: any): void {
-        //check and replce in db
+    async addEmployee(body: any, departmentId: number) {
+        //TODO: validate body and id
+        const department = await Department.findOne({id: departmentId})
+        const date = new Date()
+        const employee = new Employee(body.firstName, body.lastName, date, body.company, body.position, department)
+        await employee.save()
     }
-    addEmployee(body: any, departmentId: number): void {
-
+    async addEmployeeToDepartment(departmentId: number, employeeId: number){
+        const employee = await Employee.findOne({id: employeeId})
+        const department = await Department.findOne({id: departmentId})
+        employee.department = department
+        await employee.save()
     }
-    deleteEmployee(employeeId: number, departmentId: number): void {
-        
+    async deleteEmployee(employeeId: number, departmentId: number) {
+        //TODO departmentId
+        var employee = await Employee.findOne({id: employeeId})
+        employee.department = null
+        await employee.save()
     }
 
 }
