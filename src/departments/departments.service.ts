@@ -1,57 +1,136 @@
-import { Injectable } from '@nestjs/common';
-import e from 'express';
+import { Injectable, Logger } from '@nestjs/common';
 import { Employee } from 'src/employees/employee.model';
 import { Department } from './department.model';
+import Ajv from 'ajv';
+const ajv = new Ajv();
+import { ApiAnswer } from 'src/apianswer.class';
 
 @Injectable()
 export class DepartmentsService {
-    async getDepartments() {
-        var departments = await Department.find({ relations: ["employees"]})
-        for(var key in departments) {
-            var dep = departments[key] 
-            dep["employeesCount"] = departments[key].employees.length;
-            delete dep.employees
-        }
-        return {
-            departments: departments
-        }
+  private readonly logger = new Logger(DepartmentsService.name);
+  async getDepartments() {
+    const departments = await Department.createQueryBuilder('Department')
+      .loadRelationCountAndMap(
+        'Department.employeesCount',
+        'Department.employees',
+      )
+      .getMany();
+    return {
+      departments: departments,
+    };
+  }
+  async getDepartment(departmentId: number) {
+    let department;
+    try {
+      department = await await Department.findOneOrFail(
+        { id: departmentId },
+        { relations: ['employees'] },
+      );
+    } catch (err) {
+      this.logger.error(err);
+      return new ApiAnswer(false, 'Department not found');
     }
-    async getDepartment(departmentId: number) {
-        return {
-            department: await Department.findOne({id: departmentId}, { relations: ["employees"]})
-        }
+    return new ApiAnswer(true, department);
+  }
+  async add(body: any) {
+    const schema = {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        description: { type: 'string' },
+      },
+      required: ['name', 'description'],
+    };
+    const validate = ajv.compile(schema);
+    const data = body;
+    if (!validate(data)) {
+      const error = validate.errors.map((e) => e.message);
+      this.logger.error(error);
+      return new ApiAnswer(false, error);
     }
-    async add(body: any) {
-        //TODO: validate body
-        var name = body['name']
-        var description = body['description']
-        var date = new Date();
-        const department = new Department(name, date, description)
-        await department.save();
+    const department = new Department(body.name, new Date(), body.description);
+    await department.save();
+    return new ApiAnswer(true, department);
+  }
+  async delete(departmentId: number) {
+    //TODO: check department id
+    let department;
+    try {
+      department = await Department.findOneOrFail({ id: departmentId });
+    } catch (err) {
+      this.logger.error(err);
+      return new ApiAnswer(false, 'Department not found');
     }
-    async delete(departmentId : number) {
-        //TODO: check department id
-        const department = await Department.findOne({id: departmentId})
-        await department.remove();
+    await department.remove();
+    return new ApiAnswer(true, 'Department successfully removed');
+  }
+  async addEmployee(body: any, departmentId: number) {
+    let department;
+    try {
+      department = await Department.findOneOrFail({ id: departmentId });
+    } catch (err) {
+      this.logger.error(err);
+      return new ApiAnswer(false, 'Department not found');
     }
-    async addEmployee(body: any, departmentId: number) {
-        //TODO: validate body and id
-        const department = await Department.findOne({id: departmentId})
-        const date = new Date()
-        const employee = new Employee(body.firstName, body.lastName, date, body.company, body.position, department)
-        await employee.save()
+    const schema = {
+      type: 'object',
+      properties: {
+        firstName: { type: 'string' },
+        lastName: { type: 'string' },
+        company: { type: 'string' },
+        position: { type: 'string' },
+      },
+      required: ['firstName', 'lastName', 'company', 'position'],
+    };
+    const validate = ajv.compile(schema);
+    const data = body;
+    if (!validate(data)) {
+      const error = validate.errors.map((e) => e.message);
+      this.logger.error(error);
+      return new ApiAnswer(false, error);
     }
-    async addEmployeeToDepartment(departmentId: number, employeeId: number){
-        const employee = await Employee.findOne({id: employeeId})
-        const department = await Department.findOne({id: departmentId})
-        employee.department = department
-        await employee.save()
+    const employee = new Employee(
+      body.firstName,
+      body.lastName,
+      new Date(),
+      body.company,
+      body.position,
+      department,
+    );
+    await employee.save();
+    return new ApiAnswer(true, employee);
+  }
+  async addEmployeeToDepartment(departmentId: number, employeeId: number) {
+    let employee, department;
+    try {
+      employee = await Employee.findOneOrFail({ id: employeeId });
+    } catch (err) {
+      this.logger.error(err);
+      return new ApiAnswer(false, 'Employee not found');
     }
-    async deleteEmployee(employeeId: number, departmentId: number) {
-        //TODO departmentId
-        var employee = await Employee.findOne({id: employeeId})
-        employee.department = null
-        await employee.save()
+    try {
+      department = await Department.findOneOrFail({ id: departmentId });
+    } catch (err) {
+      this.logger.error(err);
+      return new ApiAnswer(false, 'Department not found');
     }
-
+    employee.department = department;
+    await employee.save();
+    return new ApiAnswer(true, employee);
+  }
+  async deleteEmployee(employeeId: number, departmentId: number) {
+    let employee;
+    try {
+      employee = await Employee.findOneOrFail({ id: employeeId });
+    } catch (err) {
+      this.logger.error(err);
+      return new ApiAnswer(false, 'Not found  employee');
+    }
+    if (employee.department != departmentId) {
+      return new ApiAnswer(false, 'Department not found');
+    }
+    employee.department = null;
+    await employee.save();
+    return new ApiAnswer(true, 'Employee successfully removed from department');
+  }
 }

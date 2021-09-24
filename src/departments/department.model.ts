@@ -1,28 +1,33 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Employee } from "src/employees/employee.model";
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Employee } from 'src/employees/employee.model';
 
-@Entity({name: "departments"})
+@Entity({ name: 'departments' })
 export class Department extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column()
-    date: Date;
+  @Column()
+  date: Date;
 
-    @Column()
-    description: string;
+  @Column()
+  description: string;
 
-    @OneToMany(type => Employee, employee => employee.department)
-    employees: Employee[];
+  @OneToMany(() => Employee, (employee) => employee.department)
+  employees: Employee[];
 
-
-    constructor(name: string, date: Date, description: string, id?: number) {
-        super()
-        this.name = name
-        this.date = date
-        this.description = description
-    }
+  constructor(name: string, date: Date, description: string) {
+    super();
+    this.name = name;
+    this.date = date;
+    this.description = description;
+  }
 }

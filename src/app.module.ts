@@ -20,8 +20,8 @@ import { Department } from './departments/department.model';
       database: 'test',
       logging: true,
       synchronize: true,
-      entities: [Employee, Department]
-    })
+      entities: [Employee, Department],
+    }),
   ],
   controllers: [AppController, DepartmentsController, EmployeesController],
   providers: [DashboardService, DepartmentsService, EmployeesService],

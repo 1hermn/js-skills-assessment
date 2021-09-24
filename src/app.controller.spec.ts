@@ -17,9 +17,9 @@ describe('AppController', () => {
   describe('root', () => {
     it('should return "Hello World!"', () => {
       expect(appController).toBe({
-        "top-five-employees": [],
-        "five-last-employees": []
-   });
+        'top-five-employees': [],
+        'five-last-employees': [],
+      });
     });
   });
 });
