@@ -121,12 +121,16 @@ export class DepartmentsService {
   async deleteEmployee(employeeId: number, departmentId: number) {
     let employee;
     try {
-      employee = await Employee.findOneOrFail({ id: employeeId });
+      employee = await Employee.findOneOrFail(
+        { id: employeeId },
+        { relations: ['department'] },
+      );
     } catch (err) {
       this.logger.error(err);
       return new ApiAnswer(false, 'Not found  employee');
     }
-    if (employee.department != departmentId) {
+    console.log(employee);
+    if (employee.department.id != departmentId) {
       return new ApiAnswer(false, 'Department not found');
     }
     employee.department = null;

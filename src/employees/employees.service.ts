@@ -9,8 +9,7 @@ const ajv = new Ajv();
 export class EmployeesService {
   private readonly logger = new Logger(EmployeesService.name);
   async getEmployees(name?: string) {
-    console.log(name);
-    if (name != undefined) {
+    if (typeof name != 'undefined') {
       return await Employee.find({ firstName: name });
     } else {
       return await Employee.find();
