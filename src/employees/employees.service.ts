@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Employee } from './employee.model';
-import { Department } from 'src/departments/department.model';
-import { ApiAnswer } from 'src/apianswer.class';
+import { Department } from '../departments/department.model';
+import { ApiAnswer } from '../apianswer.class';
 
 @Injectable()
 export class EmployeesService {
   private readonly logger = new Logger(EmployeesService.name);
   async getEmployees(name?: string) {
-    if (typeof name != 'undefined') {
+    if (typeof name !== 'undefined') {
       return await Employee.find({ firstName: name });
     } else {
       return await Employee.find();

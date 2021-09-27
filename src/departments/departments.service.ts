@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { Employee } from 'src/employees/employee.model';
+import { Employee } from '../employees/employee.model';
 import { Department } from './department.model';
-import { ApiAnswer } from 'src/apianswer.class';
+import { ApiAnswer } from '../apianswer.class';
 
 @Injectable()
 export class DepartmentsService {

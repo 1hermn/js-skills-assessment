@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Employee } from 'src/employees/employee.model';
+import { Employee } from '../employees/employee.model';
 import { IsNotEmpty, IsString } from 'class-validator';
 
 @Entity({ name: 'departments' })

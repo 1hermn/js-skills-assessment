@@ -7,7 +7,7 @@ import {
   ParseIntPipe,
   Post,
 } from '@nestjs/common';
-import { Employee } from 'src/employees/employee.model';
+import { Employee } from '../employees/employee.model';
 import { Department } from './department.model';
 import { DepartmentsService } from './departments.service';
 
