@@ -1,4 +1,4 @@
-import { HttpException, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Employee } from 'src/employees/employee.model';
 import { Department } from './department.model';
 import { ApiAnswer } from 'src/apianswer.class';
@@ -30,8 +30,18 @@ export class DepartmentsService {
     return new ApiAnswer(true, department);
   }
   async delete(departmentId: number) {
-    const department = await Department.findOneOrFail({ id: departmentId });
-    await department.remove();
+    const department = await Department.findOneOrFail(
+      { id: departmentId },
+      { relations: ['employees'] },
+    );
+    try {
+      await department.remove();
+    } catch (err) {
+      throw new HttpException(
+        `Remove employees first. You can find them at /departments/${departmentId}`,
+        HttpStatus.CONFLICT,
+      );
+    }
     return new ApiAnswer(true, 'Department successfully removed');
   }
   async addEmployee(body: Employee, departmentId: number) {
