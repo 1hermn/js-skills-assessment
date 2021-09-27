@@ -17,7 +17,7 @@ import { Department } from './departments/department.model';
       port: 5432,
       username: 'postgres',
       password: 'test',
-      database: 'test',
+      database: 'jsskill',
       logging: true,
       synchronize: true,
       entities: [Employee, Department],
