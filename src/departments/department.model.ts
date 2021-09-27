@@ -6,18 +6,23 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Employee } from 'src/employees/employee.model';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 @Entity({ name: 'departments' })
 export class Department extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @IsNotEmpty()
+  @IsString()
   @Column()
   name: string;
 
   @Column()
   date: Date;
 
+  @IsNotEmpty()
+  @IsString()
   @Column()
   description: string;
 

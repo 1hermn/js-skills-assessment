@@ -8,6 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { Employee } from './employee.model';
 import { EmployeesService } from './employees.service';
 
 @Controller('employees')
@@ -22,7 +23,7 @@ export class EmployeesController {
     return this.employeesService.getEmployee(id);
   }
   @Post()
-  addEmployee(@Body() body: any) {
+  addEmployee(@Body() body: Employee) {
     return this.employeesService.addEmployee(body);
   }
   @Delete(':id')

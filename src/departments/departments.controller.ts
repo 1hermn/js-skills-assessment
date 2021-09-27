@@ -7,6 +7,8 @@ import {
   ParseIntPipe,
   Post,
 } from '@nestjs/common';
+import { Employee } from 'src/employees/employee.model';
+import { Department } from './department.model';
 import { DepartmentsService } from './departments.service';
 
 @Controller('departments')
@@ -23,7 +25,7 @@ export class DepartmentsController {
     return this.departmentService.getDepartment(departmentId);
   }
   @Post()
-  async add(@Body() body: any) {
+  async add(@Body() body: Department) {
     return this.departmentService.add(body);
   }
   @Delete(':id')
@@ -32,7 +34,7 @@ export class DepartmentsController {
   }
   @Post(':departmentId')
   async addEmployee(
-    @Body() body: any,
+    @Body() body: Employee,
     @Param('departmentId', ParseIntPipe) departmentId: number,
   ) {
     return this.departmentService.addEmployee(body, departmentId);
