@@ -15,7 +15,7 @@ import { EmployeesService } from './employees.service';
 export class EmployeesController {
   constructor(private readonly employeesService: EmployeesService) {}
   @Get()
-  getEmployees(@Query('name') name: string) {
+  getEmployees(@Query('name') name?: string) {
     return this.employeesService.getEmployees(name);
   }
   @Get(':id')

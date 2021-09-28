@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Employee } from './employee.model';
 import { Department } from '../departments/department.model';
-import { ApiAnswer } from '../apianswer.class';
 
 @Injectable()
 export class EmployeesService {
@@ -26,18 +25,18 @@ export class EmployeesService {
       department,
     );
     await employee.save();
-    return new ApiAnswer(true, employee);
+    return employee;
   }
   async deleteEmployee(employeeId: number) {
     const employee = await Employee.findOneOrFail({ id: employeeId });
     await employee.remove();
-    return new ApiAnswer(true, 'Employee successfully removed');
+    return 'Employee successfully removed';
   }
   async getEmployee(id: number) {
     const employee = await Employee.findOneOrFail(
       { id: id },
       { relations: ['department'] },
     );
-    return new ApiAnswer(true, employee);
+    return employee;
   }
 }

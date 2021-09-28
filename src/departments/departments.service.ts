@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Employee } from '../employees/employee.model';
 import { Department } from './department.model';
-import { ApiAnswer } from '../apianswer.class';
 
 @Injectable()
 export class DepartmentsService {
@@ -22,12 +21,12 @@ export class DepartmentsService {
       { id: departmentId },
       { relations: ['employees'] },
     );
-    return new ApiAnswer(true, department);
+    return department;
   }
   async add(body: Department) {
     const department = new Department(body.name, new Date(), body.description);
     await department.save();
-    return new ApiAnswer(true, department);
+    return department;
   }
   async delete(departmentId: number) {
     const department = await Department.findOneOrFail(
@@ -42,7 +41,7 @@ export class DepartmentsService {
         HttpStatus.CONFLICT,
       );
     }
-    return new ApiAnswer(true, 'Department successfully removed');
+    return 'Department successfully removed';
   }
   async addEmployee(body: Employee, departmentId: number) {
     const department = await Department.findOneOrFail({ id: departmentId });
@@ -55,21 +54,24 @@ export class DepartmentsService {
       department,
     );
     await employee.save();
-    return new ApiAnswer(true, employee);
+    return employee;
   }
   async addEmployeeToDepartment(departmentId: number, employeeId: number) {
     const employee = await Employee.findOneOrFail({ id: employeeId });
     const department = await Department.findOneOrFail({ id: departmentId });
     employee.department = department;
     await employee.save();
-    return new ApiAnswer(true, employee);
+    return employee;
   }
   async deleteEmployee(employeeId: number, departmentId: number) {
     const employee = await Employee.findOneOrFail(
       { id: employeeId },
       { relations: ['department'] },
     );
-    if (employee.department.id != departmentId) {
+    if (
+      typeof employee.department === 'undefined' ||
+      employee.department.id != departmentId
+    ) {
       throw new HttpException(
         `There is no employee with id = ${employeeId} in department with id : ${departmentId}`,
         404,
@@ -77,6 +79,6 @@ export class DepartmentsService {
     }
     employee.department = null;
     await employee.save();
-    return new ApiAnswer(true, 'Employee successfully removed from department');
+    return 'Employee successfully removed from department';
   }
 }

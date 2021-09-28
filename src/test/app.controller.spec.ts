@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { AppController } from '../app.controller';
+import { DashboardService } from '../app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { createQueryBuilder } from 'typeorm';
-import { AppController } from './app.controller';
-import { DashboardService } from './app.service';
-import { Department } from './departments/department.model';
-import { Employee } from './employees/employee.model';
-jest.mock('./app.service');
+import { Employee } from '../employees/employee.model';
+import { Department } from '../departments/department.model';
+jest.mock('../app.service');
 
 describe('AppController', () => {
   let dashboardService: DashboardService;
@@ -22,7 +21,7 @@ describe('AppController', () => {
           password: 'test',
           database: 'jsskill',
           logging: false,
-          synchronize: true,
+          synchronize: false,
           entities: [Employee, Department],
           keepConnectionAlive: true,
         }),
@@ -38,20 +37,6 @@ describe('AppController', () => {
     it('should call the service', async () => {
       const dashboard = appController.getDashboard();
       expect(dashboardService.getDashboard).toHaveBeenCalled();
-    });
-    it('should return Departments and Employees', async () => {
-      let result: {
-        topFiveDepartments: Department[];
-        lastFiveEmployees: Employee[];
-      };
-      expect(await dashboardService.getDashboard()).toBe(result);
-    });
-    it('should be defined', () => {
-      expect(dashboardService).toBeDefined();
-    });
-    it('return a value', async () => {
-      const dsh = await dashboardService.getDashboard();
-      expect(dashboardService.getDashboard).toHaveReturned();
     });
   });
 });
