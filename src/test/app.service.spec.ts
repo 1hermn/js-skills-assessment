@@ -4,7 +4,7 @@ import { DashboardService } from '../app.service';
 import { Department } from '../departments/department.model';
 import { Employee } from '../employees/employee.model';
 
-describe('AppService', () => {
+describe('AppController', () => {
   let dashboardService: DashboardService;
 
   beforeEach(async () => {
